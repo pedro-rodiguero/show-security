@@ -1,19 +1,12 @@
-/* static/css/hedar_styles.css */
-
 .main-header {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   padding: 10px 30px;
-  background: rgba(
-    0,
-    0,
-    0,
-    0.9
-  ); /* Aumentei a opacidade para garantir contraste */
+  background: rgba(0, 0, 0, 0.9);
   color: white;
-  z-index: 100; /* Prioridade máxima */
+  z-index: 100;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -27,20 +20,17 @@
   gap: 20px;
 }
 
-/* --- Informação de IP (Novo) --- */
 .ip-info-section {
   font-size: 0.9em;
   padding: 0 10px;
-  /* Centraliza o IP no espaço entre o logo e os botões */
   flex-grow: 1;
   justify-content: center;
 }
 
-/* --- Formulário de Simulação de IP --- */
 .ip-form {
   display: flex;
   gap: 5px;
-  margin-right: 10px; /* Espaço antes do botão de logout */
+  margin-right: 10px;
 }
 
 .ip-input {
@@ -53,7 +43,6 @@
   color: #333;
 }
 
-/* --- Logo e Nome do Site --- */
 .header-logo {
   display: flex;
   align-items: center;
@@ -72,7 +61,6 @@
   font-size: 1.2em;
 }
 
-/* --- Botões e Funcionalidades --- */
 .header-btn {
   padding: 8px 15px;
   border: 1px solid rgba(255, 255, 255, 0.5);
@@ -90,7 +78,6 @@
   border-color: white;
 }
 
-/* Estilo específico para o botão de solução de problemas / Logout */
 .solve-btn {
   background-color: #bd232d;
   border-color: #bd232d;
@@ -101,7 +88,6 @@
   border-color: #3e3483;
 }
 
-/* --- Offset (Necessário para empurrar o BODY) --- */
 .offset-header {
   padding-top: 50px;
 }

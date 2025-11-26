@@ -10,7 +10,6 @@ body {
   background-color: #000;
 }
 
-/* --- Estilo para o Link de Registro (Novo) --- */
 .registration-link {
   text-align: center;
   margin-bottom: 20px;
@@ -18,7 +17,7 @@ body {
   color: rgba(255, 255, 255, 0.9);
 }
 .register-text-link {
-  color: #ffcc00; /* Cor de destaque */
+  color: #ffcc00;
   text-decoration: none;
   font-weight: bold;
   transition: color 0.3s;
@@ -28,25 +27,22 @@ body {
   text-decoration: underline;
 }
 
-/* --- Controle de Nível (Posicionamento Centralizado e Horizontal) --- */
 .level-controls {
-  position: fixed; /* Fixa na tela */
-  top: 50%; /* Centraliza Verticalmente */
-  left: 10%; /* Começa a 10% da borda esquerda */
-  width: 80%; /* Ocupa 80% da largura da tela */
-  transform: translateY(-50%); /* Ajuste de centralização vertical */
-  z-index: 30; /* Acima de todo o resto */
+  position: fixed;
+  top: 50%;
+  left: 10%;
+  width: 80%;
+  transform: translateY(-50%);
+  z-index: 30;
 
   display: flex;
-  flex-direction: column; /* MUDANÇA: Voltando para coluna para empilhar o link e os botões */
+  flex-direction: column;
   justify-content: center;
   align-items: center;
   gap: 20px;
 }
 
-/* --- Botão de Nível --- */
 .level-button {
-  /* Mantido como estava, mas agora a lista é coluna */
   display: block;
   padding: 15px 20px;
   text-decoration: none;
@@ -54,35 +50,29 @@ body {
   font-weight: bold;
   font-size: 0.9em;
   border-radius: 25px;
-  width: 100%; /* Ocupa a largura total do .level-controls */
-  max-width: 350px; /* Limita a largura dos botões */
+  width: 100%;
+  max-width: 350px;
 
-  /* Cor de fundo transparente (translucent) */
   background-color: rgba(255, 255, 255, 0.15);
   color: white;
   border: 1px solid rgba(255, 255, 255, 0.5);
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
 
-  /* Transição suave para o efeito de opacidade */
   transition: background-color 0.3s ease, border-color 0.3s ease,
     transform 0.2s ease;
 }
 .level-button:hover {
-  /* Torna opaco no hover */
   background-color: rgba(255, 255, 255, 1);
   border-color: rgba(255, 255, 255, 1);
   color: #000;
   transform: scale(1.05);
 }
 
-/* --- Video Background Styles --- */
 .video-background {
   position: fixed;
-  /* Começa 50px abaixo da borda superior (abaixo do header) */
   top: 50px;
   left: 0;
   width: 100%;
-  /* Define a altura: 100% da viewport menos a altura do header */
   height: calc(100% - 50px);
   z-index: 1;
   overflow: hidden;

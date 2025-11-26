@@ -1,35 +1,29 @@
-/* login_styles.css */
-
 html,
 body {
   margin: 0;
   padding: 0;
   height: 100vh;
   font-family: "Lato", sans-serif;
-  overflow: hidden; /* O MAIS IMPORTANTE: Remove todas as barras de rolagem */
+  overflow: hidden;
 }
 
 body {
   background: linear-gradient(135deg, #3e3483, #bd232d);
 }
 
-/* --- Offset para Header Fixo (CORRIGIDO: Aplicado ao BODY) --- */
 .offset-header {
-  padding-top: 50px; /* Altura do header */
+  padding-top: 50px;
 }
 
-/* --- Wrapper Centralizer --- */
 .main-wrapper {
   display: flex;
   justify-content: center;
   align-items: center;
-  /* CORREÇÃO: Subtrai o padding-top de 50px da altura total */
   height: calc(100vh - 50px);
   padding: 20px;
   box-sizing: border-box;
 }
 .container {
-  /* Central container */
   display: flex;
   width: 90%;
   max-width: 1100px;
@@ -40,7 +34,6 @@ body {
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
 }
 
-/* --- Left Panel (50% - Video and Logo/Text) --- */
 .left-pane {
   flex: 1;
   position: relative;
@@ -78,8 +71,8 @@ body {
   width: 100%;
   height: 100%;
   display: flex;
-  justify-content: center; /* Centraliza o logo */
-  align-items: center; /* Centraliza o logo */
+  justify-content: center;
+  align-items: center;
   z-index: 2;
   color: white;
   text-shadow: 0 0 10px rgba(0, 0, 0, 0.8);
@@ -90,7 +83,6 @@ body {
   opacity: 0.9;
 }
 
-/* --- Right Panel (50% - Login) --- */
 .right-pane {
   flex: 1;
   display: flex;
@@ -105,7 +97,6 @@ body {
   margin-bottom: 20px;
 }
 
-/* --- Form and Components --- */
 .login-form {
   width: 100%;
   max-width: 350px;
@@ -157,7 +148,6 @@ body {
   font-size: 0.9em;
 }
 
-/* --- Alert Messages (Django Messages) --- */
 .messages {
   list-style: none;
   padding: 0;
@@ -186,11 +176,9 @@ body {
   border: 1px solid #faebcc;
 }
 
-/* Adicionado ao final do login_styles.css */
-
 .brute-force-btn {
   padding: 12px;
-  background-color: #007bff; /* Azul para contraste */
+  background-color: #007bff;
   color: white;
   border: none;
   border-radius: 20px;

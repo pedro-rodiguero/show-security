@@ -1,4 +1,3 @@
-/* dashboard_styles.css */
 html,
 body {
   margin: 0;
@@ -10,7 +9,6 @@ body {
   overflow: hidden;
 }
 
-/* Garante que o dashboard use o espaço abaixo do header */
 .main-wrapper {
   display: flex;
   justify-content: center;
@@ -80,7 +78,6 @@ body {
   background-color: #2b255a;
 }
 
-/* Estilos de Mensagem (replicados do login_styles para consistência) */
 .messages {
   list-style: none;
   padding: 0;
