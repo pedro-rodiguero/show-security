@@ -1,41 +1,92 @@
+# show_security_demo/views.py
+
 from django.shortcuts import render, redirect
-from django.contrib.auth import login, authenticate
 from django.contrib import messages
+from django.contrib.auth import login, logout, authenticate
+from django.urls import reverse
+from django.contrib.auth import get_user_model
 from django.utils import timezone
 from datetime import timedelta
-from .models import CustomUser
+from django.views.decorators.http import require_http_methods
 import pyotp
+import time
+import os
 
-# Constantes para o bloqueio
-LOCKOUT_ATTEMPTS = 5
-LOCKOUT_TIME_MINUTES = 5
+CustomUser = get_user_model()
+
+# --- Helpers e Rotas Padrão ---
 
 
-def login_level1(request):
+def get_client_ip(request):
     """
-    Nível 1: Vulnerabilidade de Força Bruta.
-    A senha é verificada diretamente como texto plano.
+    Obtém o IP real do cliente.
+    Em ambiente de desenvolvimento, verifica a sessão para o IP simulado.
+    """
+    if "simulated_ip" in request.session:
+        return request.session["simulated_ip"]
+
+    x_forwarded_for = request.META.get("HTTP_X_FORWARDED_FOR")
+    if x_forwarded_for:
+        ip = x_forwarded_for.split(",")[0].strip()
+    else:
+        ip = request.META.get("REMOTE_ADDR")
+
+    if "original_ip" not in request.session:
+        request.session["original_ip"] = ip
+
+    return ip
+
+
+@require_http_methods(["GET", "POST"])
+def home(request):
+    """
+    Página inicial com os botões de seleção de nível e controle de IP.
     """
     if request.method == "POST":
-        username = request.POST.get("username")
-        password = request.POST.get("password")
+        # Lógica de simulação de IP
+        new_ip = request.POST.get("new_ip_address")
+        if new_ip:
+            request.session["simulated_ip"] = new_ip
+            messages.info(request, f"IP simulado alterado com sucesso para: {new_ip}.")
+            return redirect("home")
 
-        try:
-            # Consulta direta e insegura
-            user = CustomUser.objects.get(username=username, password=password)
-            login(request, user)
-            messages.success(request, f"Bem-vindo, {user.username}! (Login Nível 1)")
-            return redirect("home")  # Crie uma view 'home' simples
-        except CustomUser.DoesNotExist:
-            messages.error(request, "Usuário ou senha inválidos.")
+    current_ip = get_client_ip(request)
 
-    return render(request, "login.html", {"level": 1})
+    context = {
+        "current_ip": current_ip,
+        "is_authenticated": request.user.is_authenticated,
+    }
+    return render(request, "home.html", context)
 
 
-def login_level2(request):
-    """
-    Nível 2: Proteção com Rate Limiting e Hashing (Bcrypt).
-    """
+def dashboard(request):
+    """Página de sucesso após login."""
+    if not request.user.is_authenticated:
+        return redirect("home")
+
+    current_ip = get_client_ip(request)
+
+    return render(
+        request,
+        "dashboard.html",
+        {"username": request.user.username, "current_ip": current_ip},
+    )
+
+
+def user_logout(request):
+    logout(request)
+    # Limpar IP simulado ao sair
+    if "simulated_ip" in request.session:
+        del request.session["simulated_ip"]
+    messages.success(request, "Sessão encerrada com sucesso.")
+    return redirect("home")
+
+
+# --- NÍVEL 1: INSEGURO (BRUTE FORCE) ---
+
+
+@require_http_methods(["GET", "POST"])
+def login_level1(request):
     if request.method == "POST":
         username = request.POST.get("username")
         password = request.POST.get("password")
@@ -44,101 +95,152 @@ def login_level2(request):
             user = CustomUser.objects.get(username=username)
         except CustomUser.DoesNotExist:
             messages.error(request, "Usuário ou senha inválidos.")
-            return render(request, "login.html", {"level": 2})
+            return render(request, "login.html", {"level": 1})
 
-        # 1. Verificar se o usuário está bloqueado
-        if user.lockout_time and user.lockout_time > timezone.now():
-            remaining = (user.lockout_time - timezone.now()).seconds // 60
-            messages.warning(
-                request, f"Conta bloqueada. Tente novamente em {remaining+1} minutos."
-            )
-            return render(request, "login.html", {"level": 2})
-
-        # 2. Autenticar usando o sistema seguro do Django
-        authenticated_user = authenticate(request, username=username, password=password)
-
-        if authenticated_user is not None:
-            # 3. Sucesso: resetar contadores e fazer login
-            user.failed_attempts = 0
-            user.lockout_time = None
-            user.save()
-            login(request, authenticated_user)
-            messages.success(request, f"Bem-vindo, {user.username}! (Login Nível 2)")
-            return redirect("home")
+        # VULNERABILIDADE: Verifica a senha em texto simples!
+        if password == user.insecure_password_plaintext:
+            login(request, user)
+            messages.success(request, "Login Nível 1 bem-sucedido (VULNERÁVEL!).")
+            return redirect("dashboard")
         else:
-            # 4. Falha: incrementar contador e bloquear se necessário
-            user.failed_attempts += 1
-            if user.failed_attempts >= LOCKOUT_ATTEMPTS:
-                user.lockout_time = timezone.now() + timedelta(
-                    minutes=LOCKOUT_TIME_MINUTES
-                )
-                messages.error(
-                    request,
-                    f"Usuário ou senha inválidos. A conta foi bloqueada por {LOCKOUT_TIME_MINUTES} minutos.",
-                )
-            else:
-                remaining_attempts = LOCKOUT_ATTEMPTS - user.failed_attempts
-                messages.error(
-                    request,
-                    f"Usuário ou senha inválidos. {remaining_attempts} tentativas restantes.",
-                )
-            user.save()
+            # Não há limite de tentativas; o atacante pode tentar infinitamente.
+            messages.error(request, "Senha inválida. Tente novamente.")
 
-    return render(request, "login.html", {"level": 2})
+    return render(request, "login.html", {"level": 1})
 
 
-def login_level3(request):
-    """
-    Nível 3: Login com senha que redireciona para verificação 2FA.
-    """
+# --- NÍVEL 2: INTERMEDIÁRIO (RATE LIMIT) ---
+
+
+@require_http_methods(["GET", "POST"])
+def login_level2(request):
+    # Valores de segurança definidos no models.py
+    LOCKOUT_DURATION_MINUTES = 5
+    MAX_FAILED_ATTEMPTS = 5
+
     if request.method == "POST":
         username = request.POST.get("username")
         password = request.POST.get("password")
 
-        user = authenticate(request, username=username, password=password)
+        try:
+            user = CustomUser.objects.get(username=username)
+        except CustomUser.DoesNotExist:
+            messages.error(request, "Credenciais inválidas.")
+            time.sleep(1)
+            return render(request, "login.html", {"level": 2})
 
-        if user is not None:
-            # Senha correta. Não faz login ainda.
-            # Armazena o ID do usuário na sessão para a próxima etapa.
+        # 1. VERIFICAÇÃO DE BLOQUEIO (LOCKOUT)
+        if user.is_locked_out():
+            wait_time = int((user.lockout_time - timezone.now()).total_seconds())
+            messages.warning(
+                request, f"Conta bloqueada. Tente novamente em {wait_time} segundos."
+            )
+            return render(request, "login.html", {"level": 2})
+
+        # 2. AUTENTICAÇÃO SEGURA (Usando check_password do Django)
+        if user.check_password(password):
+            # Login bem-sucedido: Reseta o contador
+            user.failed_attempts = 0
+            user.lockout_time = None
+            user.save()
+
+            login(request, user)
+            messages.success(request, "Login Nível 2 bem-sucedido (Seguro!).")
+            return redirect("dashboard")
+        else:
+            # Login falhou: Incrementa o contador
+            user.failed_attempts += 1
+
+            # 3. BLOQUEIO DE CONTA (LOCKOUT LOGIC)
+            if user.failed_attempts >= MAX_FAILED_ATTEMPTS:
+                user.lockout_time = timezone.now() + timedelta(
+                    minutes=LOCKOUT_DURATION_MINUTES
+                )
+                messages.error(
+                    request,
+                    f"Muitas tentativas. Conta bloqueada por {LOCKOUT_DURATION_MINUTES} minutos.",
+                )
+            else:
+                messages.error(
+                    request,
+                    f"Senha inválida. Tentativas restantes: {MAX_FAILED_ATTEMPTS - user.failed_attempts}.",
+                )
+
+            user.save()
+            time.sleep(1)  # Adiciona um atraso fixo
+
+    return render(request, "login.html", {"level": 2})
+
+
+# --- NÍVEL 3: AVANÇADO (2FA) ---
+
+
+@require_http_methods(["GET", "POST"])
+def login_level3(request):
+    if request.method == "POST":
+        username = request.POST.get("username")
+        password = request.POST.get("password")
+
+        try:
+            user = CustomUser.objects.get(username=username)
+        except CustomUser.DoesNotExist:
+            messages.error(request, "Credenciais inválidas.")
+            return render(request, "login.html", {"level": 3})
+
+        # 1. Verificação de Senha (Primeiro Fator)
+        if user.check_password(password):
+            # Armazena temporariamente o ID do usuário na sessão
             request.session["2fa_user_id"] = user.id
+            request.session["2fa_authenticated"] = True
+
+            messages.info(request, "Primeiro fator bem-sucedido. Insira o código 2FA.")
             return redirect("verify_2fa")
         else:
-            messages.error(request, "Usuário ou senha inválidos.")
+            messages.error(request, "Senha inválida.")
 
     return render(request, "login.html", {"level": 3})
 
 
+@require_http_methods(["GET", "POST"])
 def verify_2fa(request):
-    """
-    Verifica o código TOTP após o login com senha bem-sucedido.
-    """
     user_id = request.session.get("2fa_user_id")
-    if not user_id:
-        return redirect("login_level3")  # Redireciona se não houver usuário na sessão
+
+    if not user_id or not request.session.get("2fa_authenticated"):
+        messages.warning(request, "Acesso negado. Por favor, faça login novamente.")
+        return redirect("home")
 
     try:
         user = CustomUser.objects.get(id=user_id)
     except CustomUser.DoesNotExist:
-        return redirect("login_level3")
+        messages.error(request, "Erro na sessão. Usuário não encontrado.")
+        return redirect("home")
 
     if request.method == "POST":
         token = request.POST.get("token")
+
+        if not user.two_factor_secret:
+            messages.error(
+                request,
+                "2FA não configurado para este usuário. Entre em contato com o suporte.",
+            )
+            return redirect("home")
+
+        # 1. VERIFICAÇÃO DO CÓDIGO TOTP
         totp = pyotp.TOTP(user.two_factor_secret)
 
         if totp.verify(token):
-            # Código 2FA correto. Limpa a sessão e faz o login.
-            del request.session["2fa_user_id"]
+            # 2. Login Final e Limpeza da Sessão
             login(request, user)
-            messages.success(
-                request, f"Bem-vindo, {user.username}! (Login Nível 3 com 2FA)"
-            )
-            return redirect("home")
+
+            # Limpa chaves de 2FA
+            if "2fa_user_id" in request.session:
+                del request.session["2fa_user_id"]
+            if "2fa_authenticated" in request.session:
+                del request.session["2fa_authenticated"]
+
+            messages.success(request, "Login Nível 3 bem-sucedido (2FA Ativo!).")
+            return redirect("dashboard")
         else:
-            messages.error(request, "Código de verificação inválido.")
+            messages.error(request, "Código 2FA inválido.")
 
     return render(request, "verify_2fa.html")
-
-
-# Uma view simples para a página inicial após o login
-def home(request):
-    return render(request, "home.html")
