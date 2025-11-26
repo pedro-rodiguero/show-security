@@ -1,0 +1,67 @@
+/* home_style.css */
+
+/* --- Estilos Base --- */
+html,
+body {
+  margin: 0;
+  padding: 0;
+  height: 100vh; /* Define a altura total da viewport */
+  font-family: sans-serif;
+  color: white; /* Cor de texto para contraste com o vídeo escuro */
+  overflow: hidden; /* Evita barras de rolagem */
+  background-color: #000; /* Fundo preto caso o vídeo demore a carregar */
+}
+
+/* --- Estilos do Conteúdo (Sobreposição) --- */
+.content-wrapper {
+  position: relative;
+  z-index: 20; /* Z-index muito alto para garantir que o conteúdo fique acima de tudo */
+  max-width: 500px;
+  margin: 50px auto;
+  padding: 20px;
+  background: rgba(0, 0, 0, 0.7); /* Fundo mais escuro para legibilidade */
+  border-radius: 8px;
+  box-shadow: 0 0 15px rgba(255, 255, 255, 0.2);
+}
+.content-wrapper a {
+  color: #ffcc00; /* Cor de destaque para links */
+}
+
+/* --- Estilos do Background de Vídeo --- */
+.video-background {
+  position: fixed; /* Fixa o vídeo no background */
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1; /* Fica abaixo do conteúdo */
+  overflow: hidden;
+}
+.video-background iframe {
+  /* Técnica de "background-size: cover" para IFRAME */
+  position: absolute;
+  top: 50%;
+  left: 50%;
+
+  /* Garante que o vídeo cubra 100% da viewport */
+  min-width: 100%;
+  min-height: 100%;
+  width: 120%;
+  height: 120%;
+
+  /* Centraliza e aplica zoom para cobrir a tela sem barras pretas */
+  transform: translate(-50%, -50%) scale(1.1);
+  border: none;
+  z-index: 1; /* Abaixo do bloqueador */
+}
+/* Bloqueia a interação do mouse com o iframe */
+.iframe-blocker {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 10; /* Acima do iframe, abaixo do conteúdo principal */
+  background: transparent;
+  pointer-events: auto;
+}

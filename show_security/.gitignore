@@ -1,0 +1,59 @@
+# -------------------------------------------------------------------------
+# Python
+# -------------------------------------------------------------------------
+
+# Ignorar o ambiente virtual
+venv/
+*.pyc
+__pycache__/
+*.pyd
+*.so
+
+# Arquivos de log e depuração
+*.log
+*.pot
+
+# Arquivos de empacotamento
+.Python
+build/
+dist/
+*.egg-info/
+
+# -------------------------------------------------------------------------
+# Django
+# -------------------------------------------------------------------------
+
+# Banco de dados SQLite local
+# Este é o arquivo que você mencionou:
+db.sqlite3
+
+# Arquivos de mídia e estáticos gerados (se usados em produção)
+/media/
+/static_collected/
+
+# Arquivos de migração que não são de '0001_initial'
+# É bom ignorar estes se você estiver trabalhando em equipe e não for o responsável 
+# por gerenciar o esquema do banco de dados, mas geralmente é melhor tê-los, 
+# exceto os temporários.
+
+# Logs de debug/execução
+*.pid
+*.sock
+*.seed
+
+# -------------------------------------------------------------------------
+# IDEs e Ferramentas Comuns
+# -------------------------------------------------------------------------
+
+# JetBrains IDEs (PyCharm, WebStorm, etc.)
+.idea/
+
+# VS Code
+.vscode/
+
+# Histórico do shell
+.history
+
+.env
+db.sqlite3
+show_security/db.sqlite3
