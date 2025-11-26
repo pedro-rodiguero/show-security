@@ -1,14 +1,21 @@
+/* login_styles.css */
+
 html,
 body {
   margin: 0;
   padding: 0;
-  min-height: 100vh; /* Permite que o body se ajuste ao conteúdo, mas garanta altura mínima */
+  height: 100vh;
   font-family: "Lato", sans-serif;
+  overflow: hidden; /* O MAIS IMPORTANTE: Remove todas as barras de rolagem */
 }
 
 body {
   background: linear-gradient(135deg, #3e3483, #bd232d);
-  overflow-x: hidden; /* Garante que não haja scroll horizontal */
+}
+
+/* --- Offset para Header Fixo (CORRIGIDO: Aplicado ao BODY) --- */
+.offset-header {
+  padding-top: 50px; /* Altura do header */
 }
 
 /* --- Wrapper Centralizer --- */
@@ -16,16 +23,11 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: 100vh; /* Garante que ele ocupe o máximo da viewport */
+  /* CORREÇÃO: Subtrai o padding-top de 50px da altura total */
+  height: calc(100vh - 50px);
   padding: 20px;
   box-sizing: border-box;
 }
-
-/* --- Offset para Header Fixo (Necessário para empurrar o conteúdo) --- */
-.offset-header {
-  padding-top: 50px; 
-}
-
 .container {
   /* Central container */
   display: flex;
@@ -165,3 +167,21 @@ body {
 }
 .messages li {
   padding: 10px;
+  border-radius: 4px;
+  margin-bottom: 5px;
+}
+.messages li.error {
+  color: #a94442;
+  background-color: #f2dede;
+  border: 1px solid #ebccd1;
+}
+.messages li.success {
+  color: #3c763d;
+  background-color: #dff0d8;
+  border: 1px solid #d6e9c6;
+}
+.messages li.warning {
+  color: #8a6d3b;
+  background-color: #fcf8e3;
+  border: 1px solid #faebcc;
+}

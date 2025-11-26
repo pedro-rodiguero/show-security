@@ -16,7 +16,6 @@
       type="text/css"
       href="{% static 'css/header_style.css' %}"
     />
-    <!-- CORREÇÃO AQUI: USANDO login_styles.css -->
     <link
       rel="stylesheet"
       type="text/css"
@@ -24,12 +23,9 @@
     />
   </head>
   <body class="offset-header">
-    <!-- Adicionado body class para offset -->
-    <!-- Assumindo que a inclusão do header está corrigida (ex: show_security_demo/header.html ou apenas header.html) -->
     {% include "header.html" %}
 
     <div class="main-wrapper">
-      <!-- Removido offset-header pois foi movido para o body -->
       <div class="container">
         <div class="left-pane">
           <div class="video-background">
