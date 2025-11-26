@@ -29,7 +29,7 @@ body {
 /* --- Botão de Nível --- */
 .level-button {
   display: block;
-  padding: 15px 20px; /* Aumentado o padding para visual de botão */
+  padding: 15px 20px;
   text-decoration: none;
   text-align: center;
   font-weight: bold;
@@ -55,13 +55,15 @@ body {
   transform: scale(1.05);
 }
 
-/* --- Video Background Styles --- */
+/* --- Video Background Styles (CORREÇÃO APLICADA AQUI) --- */
 .video-background {
   position: fixed;
-  top: 0;
+  /* Começa 50px abaixo da borda superior (abaixo do header) */
+  top: 50px;
   left: 0;
   width: 100%;
-  height: 100%;
+  /* Define a altura: 100% da viewport menos a altura do header */
+  height: calc(100% - 50px);
   z-index: 1;
   overflow: hidden;
 }

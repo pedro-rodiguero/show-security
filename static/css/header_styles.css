@@ -68,3 +68,7 @@
   background-color: #3e3483;
   border-color: #3e3483;
 }
+
+.offset-header {
+  padding-top: 50px;
+}

@@ -10,21 +10,26 @@
       href="https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&display=swap"
       rel="stylesheet"
     />
+
     <link
       rel="stylesheet"
       type="text/css"
       href="{% static 'css/header_style.css' %}"
     />
+    <!-- CORREÇÃO AQUI: USANDO login_styles.css -->
     <link
       rel="stylesheet"
       type="text/css"
-      href="{% static 'css/style.css' %}"
+      href="{% static 'css/login_styles.css' %}"
     />
   </head>
-  <body>
+  <body class="offset-header">
+    <!-- Adicionado body class para offset -->
+    <!-- Assumindo que a inclusão do header está corrigida (ex: show_security_demo/header.html ou apenas header.html) -->
     {% include "header.html" %}
 
     <div class="main-wrapper">
+      <!-- Removido offset-header pois foi movido para o body -->
       <div class="container">
         <div class="left-pane">
           <div class="video-background">
