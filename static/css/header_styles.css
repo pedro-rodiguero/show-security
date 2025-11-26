@@ -1,17 +1,24 @@
+/* static/css/hedar_styles.css */
+
 .main-header {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   padding: 10px 30px;
-  background: rgba(0, 0, 0, 0.7); /* Fundo semi-transparente */
+  background: rgba(
+    0,
+    0,
+    0,
+    0.9
+  ); /* Aumentei a opacidade para garantir contraste */
   color: white;
-  z-index: 100; /* Garante que o header esteja no topo */
+  z-index: 100; /* Prioridade máxima */
   display: flex;
-  justify-content: space-between; /* Espalha as seções */
+  justify-content: space-between;
   align-items: center;
   box-sizing: border-box;
-  flex-wrap: wrap; /* Permite quebras para telas pequenas */
+  flex-wrap: wrap;
 }
 
 .header-section {
@@ -20,16 +27,20 @@
   gap: 20px;
 }
 
-/* --- Informação de IP --- */
-.ip-info {
+/* --- Informação de IP (Novo) --- */
+.ip-info-section {
   font-size: 0.9em;
   padding: 0 10px;
+  /* Centraliza o IP no espaço entre o logo e os botões */
+  flex-grow: 1;
+  justify-content: center;
 }
 
 /* --- Formulário de Simulação de IP --- */
 .ip-form {
   display: flex;
   gap: 5px;
+  margin-right: 10px; /* Espaço antes do botão de logout */
 }
 
 .ip-input {
@@ -52,7 +63,7 @@
 }
 
 .logo-small {
-  height: 30px; /* Tamanho pequeno para o logo no header */
+  height: 30px;
   width: auto;
   margin-right: 10px;
 }
@@ -90,7 +101,7 @@
   border-color: #3e3483;
 }
 
-/* --- Offset (Não se aplica diretamente ao header, mas é usado no BODY) --- */
+/* --- Offset (Necessário para empurrar o BODY) --- */
 .offset-header {
   padding-top: 50px;
 }

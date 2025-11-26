@@ -1,0 +1,80 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Criar Nova Conta</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&display=swap"
+      rel="stylesheet"
+    />
+
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="{% static 'css/header_styles.css' %}"
+    />
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="{% static 'css/login_styles.css' %}"
+    />
+  </head>
+  <body class="offset-header">
+    {% include "header.html" %}
+
+    <div class="main-wrapper">
+      <div class="container">
+        <div class="left-pane">
+          <div class="video-background">
+            <iframe
+              src="https://www.youtube-nocookie.com/embed/hUMhJ0m5fEs?autoplay=1&mute=1&loop=1&playlist=hUMhJ0m5fEs&controls=0&showinfo=0&modestbranding=1&fs=0&vq=hd1080"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+              referrerpolicy="strict-origin-when-cross-origin"
+            ></iframe>
+          </div>
+          <div class="left-content">
+            <img
+              src="{% static 'assets/loqed.webp' %}"
+              alt="Logo Loqed Systems"
+              class="logo"
+            />
+          </div>
+        </div>
+
+        <div class="right-pane">
+          <h1>Criar Conta</h1>
+
+          {% if messages %}
+          <ul class="messages">
+            {% for message in messages %}
+            <li class="{{ message.tags }}">{{ message }}</li>
+            {% endfor %}
+          </ul>
+          {% endif %}
+
+          <form method="post" class="login-form">
+            {% csrf_token %}
+
+            <label for="username">Usuário (Demo):</label>
+            <input type="text" id="username" name="username" required />
+
+            <label for="password">Senha:</label>
+            <input type="password" id="password" name="password" required />
+
+            <label for="email">E-mail (Opcional):</label>
+            <input type="email" id="email" name="email" />
+
+            <button type="submit">Registrar</button>
+
+            <div class="social-login">
+              <a href="{% url 'home' %}">Voltar para a Home</a>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

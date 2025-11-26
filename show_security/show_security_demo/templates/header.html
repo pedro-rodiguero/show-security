@@ -12,12 +12,13 @@
   </div>
 
   {% if current_ip %}
-  <div class="header-section ip-info">
+  <div class="header-section ip-info-section">
     <span>IP Atual: <strong>{{ current_ip }}</strong></span>
   </div>
   {% endif %}
 
   <div class="header-section functionality-section">
+    {% if request.resolver_match.url_name == 'home' %}
     <form method="post" action="{% url 'home' %}" class="ip-form">
       {% csrf_token %}
       <input
@@ -29,8 +30,7 @@
       />
       <button type="submit" class="header-btn">Simular Novo IP</button>
     </form>
-
-    {% if is_authenticated %}
+    {% endif %} {% if request.user.is_authenticated %}
     <a href="{% url 'logout' %}" class="header-btn solve-btn">Logout</a>
     {% else %}
     <a

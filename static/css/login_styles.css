@@ -185,3 +185,27 @@ body {
   background-color: #fcf8e3;
   border: 1px solid #faebcc;
 }
+
+/* Adicionado ao final do login_styles.css */
+
+.brute-force-btn {
+  padding: 12px;
+  background-color: #007bff; /* Azul para contraste */
+  color: white;
+  border: none;
+  border-radius: 20px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: bold;
+  margin-top: 15px;
+  transition: background-color 0.3s;
+  width: 100%;
+  max-width: 350px;
+}
+.brute-force-btn:hover {
+  background-color: #0056b3;
+}
+.brute-force-btn:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+}

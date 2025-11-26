@@ -1,0 +1,64 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Dashboard | {{ username }}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&display=swap"
+      rel="stylesheet"
+    />
+
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="{% static 'css/header_styles.css' %}"
+    />
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="{% static 'css/dashboard_styles.css' %}"
+    />
+  </head>
+  <body class="offset-header">
+    {% include "header.html" %}
+
+    <div class="main-wrapper">
+      <div class="content-panel">
+        <div class="status-box">
+          <h2>Bem-vindo, {{ username }}!</h2>
+
+          {% if messages %}
+          <ul class="messages">
+            {% for message in messages %}
+            <li class="{{ message.tags }}">{{ message }}</li>
+            {% endfor %}
+          </ul>
+          {% endif %}
+
+          <p>
+            Você acessou o sistema com sucesso. Este é o seu painel de
+            demonstração.
+          </p>
+
+          <div class="info-group">
+            <span class="info-label">Sessão Iniciada com IP:</span>
+            <span class="info-value">{{ current_ip }}</span>
+          </div>
+
+          <div class="security-status">
+            <p>
+              Simule um acesso de IP diferente (usando o campo no cabeçalho) e
+              tente fazer o login novamente para ver o alerta de segurança em
+              ação!
+            </p>
+          </div>
+
+          <a href="{% url 'logout' %}" class="btn-logout">Sair da Sessão</a>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

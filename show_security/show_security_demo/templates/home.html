@@ -7,15 +7,15 @@
     <link
       rel="stylesheet"
       type="text/css"
-      href="{% static '../../../static/css/header_styles.css' %}"
+      href="{% static 'css/header_styles.css' %}"
     />
     <link
       rel="stylesheet"
       type="text/css"
-      href="{% static '../../../static/css/home_styles.css' %}"
+      href="{% static 'css/home_styles.css' %}"
     />
   </head>
-  <body>
+  <body class="offset-header">
     {% include "header.html" %}
 
     <div class="video-background">
@@ -28,6 +28,13 @@
     </div>
 
     <div class="level-controls">
+      <div class="registration-link">
+        Ainda não tem conta?
+        <a href="{% url 'register' %}" class="register-text-link"
+          >Crie sua Conta de Demonstração aqui.</a
+        >
+      </div>
+
       <a href="{% url 'login_level1' %}" class="level-button">
         Nível 1 (Inseguro - Brute Force)
       </a>

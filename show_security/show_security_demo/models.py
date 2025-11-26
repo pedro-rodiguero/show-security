@@ -7,6 +7,12 @@ class CustomUser(AbstractUser):
     Modelo de usuário estendido para incluir funcionalidades de segurança.
     """
 
+    insecure_password_plaintext = models.CharField(
+        max_length=128,
+        blank=True,
+        help_text="NÃO USE EM PRODUÇÃO. Campo para armazenar senha em texto plano para fins de demonstração.",
+    )
+
     failed_attempts = models.IntegerField(
         default=0, help_text="Contador de tentativas de login falhas."
     )

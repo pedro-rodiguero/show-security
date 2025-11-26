@@ -1,5 +1,3 @@
-# show_security_demo/views.py
-
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.contrib.auth import login, logout, authenticate
@@ -8,20 +6,28 @@ from django.contrib.auth import get_user_model
 from django.utils import timezone
 from datetime import timedelta
 from django.views.decorators.http import require_http_methods
+from django.apps import apps  # IMPORTANTE: Para obter o modelo dinamicamente
 import pyotp
 import time
 import os
 
-CustomUser = get_user_model()
+# --- NÃO USAR AQUI: Deixe a busca do modelo para dentro das views ---
+# CustomUser = get_user_model()
 
-# --- Helpers e Rotas Padrão ---
+# --- Constantes (Em produção, estas estariam no settings.py) ---
+LOCKOUT_DURATION_MINUTES = 5
+MAX_FAILED_ATTEMPTS = 5
+# -----------------------------------------------------------------
 
 
+# Helper para obter o modelo customizado (Busca dinâmica)
+def get_custom_user_model():
+    # Isso resolve o modelo a partir do registro de apps do Django (Settings)
+    return apps.get_model("show_security_demo", "CustomUser")
+
+
+# Restante do get_client_ip, home, dashboard, logout: (sem alterações na estrutura)
 def get_client_ip(request):
-    """
-    Obtém o IP real do cliente.
-    Em ambiente de desenvolvimento, verifica a sessão para o IP simulado.
-    """
     if "simulated_ip" in request.session:
         return request.session["simulated_ip"]
 
@@ -39,11 +45,7 @@ def get_client_ip(request):
 
 @require_http_methods(["GET", "POST"])
 def home(request):
-    """
-    Página inicial com os botões de seleção de nível e controle de IP.
-    """
     if request.method == "POST":
-        # Lógica de simulação de IP
         new_ip = request.POST.get("new_ip_address")
         if new_ip:
             request.session["simulated_ip"] = new_ip
@@ -60,7 +62,6 @@ def home(request):
 
 
 def dashboard(request):
-    """Página de sucesso após login."""
     if not request.user.is_authenticated:
         return redirect("home")
 
@@ -75,61 +76,95 @@ def dashboard(request):
 
 def user_logout(request):
     logout(request)
-    # Limpar IP simulado ao sair
     if "simulated_ip" in request.session:
         del request.session["simulated_ip"]
     messages.success(request, "Sessão encerrada com sucesso.")
     return redirect("home")
 
 
-# --- NÍVEL 1: INSEGURO (BRUTE FORCE) ---
+# --- VIEW DE REGISTRO DE USUÁRIO ---
+
+
+@require_http_methods(["GET", "POST"])
+def register_user(request):
+    User = get_custom_user_model()  # Busca o modelo aqui
+    if request.method == "POST":
+        username = request.POST.get("username")
+        password = request.POST.get("password")
+        email = request.POST.get("email", f"{username}@demo.com")
+
+        if User.objects.filter(username=username).exists():
+            messages.error(request, "Nome de usuário já existe.")
+            return render(request, "register.html")
+
+        try:
+            # Usa o CustomUser.objects.create_user para hashear a senha
+            user = User.objects.create_user(
+                username=username, password=password, email=email
+            )
+
+            # Preenche o campo de texto simples
+            user.insecure_password_plaintext = password
+
+            # Para Nível 3 (Futuro): Cria um segredo 2FA básico
+            user.two_factor_secret = pyotp.random_base32()
+            user.save()
+
+            messages.success(
+                request,
+                "Conta criada com sucesso! Você pode usar as credenciais nos Níveis de Login.",
+            )
+            return redirect("home")
+
+        except Exception as e:
+            messages.error(request, f"Erro ao criar conta: {e}")
+            return render(request, "register.html")
+
+    return render(request, "register.html")
+
+
+# --- VIEWS DE LOGIN ---
 
 
 @require_http_methods(["GET", "POST"])
 def login_level1(request):
+    User = get_custom_user_model()  # Busca o modelo aqui
     if request.method == "POST":
         username = request.POST.get("username")
         password = request.POST.get("password")
 
         try:
-            user = CustomUser.objects.get(username=username)
-        except CustomUser.DoesNotExist:
+            user = User.objects.get(username=username)
+        except User.DoesNotExist:
             messages.error(request, "Usuário ou senha inválidos.")
             return render(request, "login.html", {"level": 1})
 
         # VULNERABILIDADE: Verifica a senha em texto simples!
+        # Agora o erro SÓ pode ocorrer se a tabela não foi migrada ou se o usuário não tem o campo
         if password == user.insecure_password_plaintext:
             login(request, user)
             messages.success(request, "Login Nível 1 bem-sucedido (VULNERÁVEL!).")
             return redirect("dashboard")
         else:
-            # Não há limite de tentativas; o atacante pode tentar infinitamente.
             messages.error(request, "Senha inválida. Tente novamente.")
 
     return render(request, "login.html", {"level": 1})
 
 
-# --- NÍVEL 2: INTERMEDIÁRIO (RATE LIMIT) ---
-
-
 @require_http_methods(["GET", "POST"])
 def login_level2(request):
-    # Valores de segurança definidos no models.py
-    LOCKOUT_DURATION_MINUTES = 5
-    MAX_FAILED_ATTEMPTS = 5
-
+    User = get_custom_user_model()  # Busca o modelo aqui
     if request.method == "POST":
         username = request.POST.get("username")
         password = request.POST.get("password")
 
         try:
-            user = CustomUser.objects.get(username=username)
-        except CustomUser.DoesNotExist:
+            user = User.objects.get(username=username)
+        except User.DoesNotExist:
             messages.error(request, "Credenciais inválidas.")
             time.sleep(1)
             return render(request, "login.html", {"level": 2})
 
-        # 1. VERIFICAÇÃO DE BLOQUEIO (LOCKOUT)
         if user.is_locked_out():
             wait_time = int((user.lockout_time - timezone.now()).total_seconds())
             messages.warning(
@@ -137,9 +172,7 @@ def login_level2(request):
             )
             return render(request, "login.html", {"level": 2})
 
-        # 2. AUTENTICAÇÃO SEGURA (Usando check_password do Django)
         if user.check_password(password):
-            # Login bem-sucedido: Reseta o contador
             user.failed_attempts = 0
             user.lockout_time = None
             user.save()
@@ -148,10 +181,7 @@ def login_level2(request):
             messages.success(request, "Login Nível 2 bem-sucedido (Seguro!).")
             return redirect("dashboard")
         else:
-            # Login falhou: Incrementa o contador
             user.failed_attempts += 1
-
-            # 3. BLOQUEIO DE CONTA (LOCKOUT LOGIC)
             if user.failed_attempts >= MAX_FAILED_ATTEMPTS:
                 user.lockout_time = timezone.now() + timedelta(
                     minutes=LOCKOUT_DURATION_MINUTES
@@ -167,80 +197,33 @@ def login_level2(request):
                 )
 
             user.save()
-            time.sleep(1)  # Adiciona um atraso fixo
+            time.sleep(1)
 
     return render(request, "login.html", {"level": 2})
 
 
-# --- NÍVEL 3: AVANÇADO (2FA) ---
-
-
 @require_http_methods(["GET", "POST"])
 def login_level3(request):
+    # Usando authenticate, que usa get_user_model() internamente
     if request.method == "POST":
         username = request.POST.get("username")
         password = request.POST.get("password")
 
-        try:
-            user = CustomUser.objects.get(username=username)
-        except CustomUser.DoesNotExist:
-            messages.error(request, "Credenciais inválidas.")
-            return render(request, "login.html", {"level": 3})
+        user = authenticate(request, username=username, password=password)
 
-        # 1. Verificação de Senha (Primeiro Fator)
-        if user.check_password(password):
-            # Armazena temporariamente o ID do usuário na sessão
-            request.session["2fa_user_id"] = user.id
-            request.session["2fa_authenticated"] = True
-
-            messages.info(request, "Primeiro fator bem-sucedido. Insira o código 2FA.")
-            return redirect("verify_2fa")
+        if user is not None:
+            login(request, user)
+            messages.success(
+                request, "Login Nível 3 bem-sucedido (2FA ignorado na demo)."
+            )
+            return redirect("dashboard")
         else:
-            messages.error(request, "Senha inválida.")
+            messages.error(request, "Credenciais inválidas.")
 
     return render(request, "login.html", {"level": 3})
 
 
 @require_http_methods(["GET", "POST"])
 def verify_2fa(request):
-    user_id = request.session.get("2fa_user_id")
-
-    if not user_id or not request.session.get("2fa_authenticated"):
-        messages.warning(request, "Acesso negado. Por favor, faça login novamente.")
-        return redirect("home")
-
-    try:
-        user = CustomUser.objects.get(id=user_id)
-    except CustomUser.DoesNotExist:
-        messages.error(request, "Erro na sessão. Usuário não encontrado.")
-        return redirect("home")
-
-    if request.method == "POST":
-        token = request.POST.get("token")
-
-        if not user.two_factor_secret:
-            messages.error(
-                request,
-                "2FA não configurado para este usuário. Entre em contato com o suporte.",
-            )
-            return redirect("home")
-
-        # 1. VERIFICAÇÃO DO CÓDIGO TOTP
-        totp = pyotp.TOTP(user.two_factor_secret)
-
-        if totp.verify(token):
-            # 2. Login Final e Limpeza da Sessão
-            login(request, user)
-
-            # Limpa chaves de 2FA
-            if "2fa_user_id" in request.session:
-                del request.session["2fa_user_id"]
-            if "2fa_authenticated" in request.session:
-                del request.session["2fa_authenticated"]
-
-            messages.success(request, "Login Nível 3 bem-sucedido (2FA Ativo!).")
-            return redirect("dashboard")
-        else:
-            messages.error(request, "Código 2FA inválido.")
-
-    return render(request, "verify_2fa.html")
+    messages.info(request, "Funcionalidade 2FA desabilitada na demo atual.")
+    return redirect("home")
