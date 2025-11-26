@@ -1,67 +1,91 @@
-/* home_style.css */
-
-/* --- Estilos Base --- */
+/* --- Base styles --- */
 html,
 body {
   margin: 0;
   padding: 0;
-  height: 100vh; /* Define a altura total da viewport */
+  height: 100vh;
   font-family: sans-serif;
-  color: white; /* Cor de texto para contraste com o vídeo escuro */
-  overflow: hidden; /* Evita barras de rolagem */
-  background-color: #000; /* Fundo preto caso o vídeo demore a carregar */
+  color: white;
+  overflow: hidden;
+  background-color: #000;
 }
 
-/* --- Estilos do Conteúdo (Sobreposição) --- */
-.content-wrapper {
-  position: relative;
-  z-index: 20; /* Z-index muito alto para garantir que o conteúdo fique acima de tudo */
-  max-width: 500px;
-  margin: 50px auto;
-  padding: 20px;
-  background: rgba(0, 0, 0, 0.7); /* Fundo mais escuro para legibilidade */
-  border-radius: 8px;
-  box-shadow: 0 0 15px rgba(255, 255, 255, 0.2);
-}
-.content-wrapper a {
-  color: #ffcc00; /* Cor de destaque para links */
+/* --- Controle de Nível (Posicionamento Centralizado e Horizontal) --- */
+.level-controls {
+  position: fixed; /* Fixa na tela */
+  top: 50%; /* Centraliza Verticalmente */
+  left: 10%; /* Começa a 10% da borda esquerda */
+  width: 80%; /* Ocupa 80% da largura da tela */
+  transform: translateY(-50%); /* Ajuste de centralização vertical */
+  z-index: 30; /* Acima de todo o resto */
+
+  display: flex;
+  flex-direction: row; /* Alinha os itens horizontalmente */
+  justify-content: space-around; /* Distribui os itens uniformemente */
+  align-items: center; /* Centraliza os itens verticalmente */
+  gap: 20px;
 }
 
-/* --- Estilos do Background de Vídeo --- */
+/* --- Botão de Nível --- */
+.level-button {
+  display: block;
+  padding: 15px 20px; /* Aumentado o padding para visual de botão */
+  text-decoration: none;
+  text-align: center;
+  font-weight: bold;
+  font-size: 0.9em;
+  border-radius: 25px;
+
+  /* Cor de fundo transparente (translucent) */
+  background-color: rgba(255, 255, 255, 0.15);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+
+  /* Transição suave para o efeito de opacidade */
+  transition: background-color 0.3s ease, border-color 0.3s ease,
+    transform 0.2s ease;
+}
+
+.level-button:hover {
+  /* Torna opaco no hover */
+  background-color: rgba(255, 255, 255, 1);
+  border-color: rgba(255, 255, 255, 1);
+  color: #000;
+  transform: scale(1.05);
+}
+
+/* --- Video Background Styles --- */
 .video-background {
-  position: fixed; /* Fixa o vídeo no background */
+  position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  z-index: 1; /* Fica abaixo do conteúdo */
+  z-index: 1;
   overflow: hidden;
 }
 .video-background iframe {
-  /* Técnica de "background-size: cover" para IFRAME */
   position: absolute;
   top: 50%;
   left: 50%;
 
-  /* Garante que o vídeo cubra 100% da viewport */
   min-width: 100%;
   min-height: 100%;
   width: 120%;
   height: 120%;
 
-  /* Centraliza e aplica zoom para cobrir a tela sem barras pretas */
   transform: translate(-50%, -50%) scale(1.1);
   border: none;
-  z-index: 1; /* Abaixo do bloqueador */
+  z-index: 1;
 }
-/* Bloqueia a interação do mouse com o iframe */
 .iframe-blocker {
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  z-index: 10; /* Acima do iframe, abaixo do conteúdo principal */
+  z-index: 10;
   background: transparent;
   pointer-events: auto;
 }

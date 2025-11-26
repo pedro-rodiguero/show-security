@@ -20,23 +20,16 @@
       <div class="iframe-blocker"></div>
     </div>
 
-    <div class="content-wrapper">
-      <h1>Bem-vindo!</h1>
-      {% if user.is_authenticated %}
-      <p>Você está logado como: <strong>{{ user.username }}</strong></p>
-      <p><a href="#">Logout (não implementado)</a></p>
-      {% else %}
-      <p>Você não está logado.</p>
-      {% endif %}
-      <hr />
-      <h3>Testar Logins:</h3>
-      <ul>
-        <li><a href="{% url 'login_level1' %}">Login Nível 1 (Inseguro)</a></li>
-        <li>
-          <a href="{% url 'login_level2' %}">Login Nível 2 (Rate Limit)</a>
-        </li>
-        <li><a href="{% url 'login_level3' %}">Login Nível 3 (2FA)</a></li>
-      </ul>
+    <div class="level-controls">
+      <a href="{% url 'login_level1' %}" class="level-button">
+        Nível 1 (Inseguro - Brute Force)
+      </a>
+      <a href="{% url 'login_level2' %}" class="level-button">
+        Nível 2 (Intermediário - Rate Limit)
+      </a>
+      <a href="{% url 'login_level3' %}" class="level-button">
+        Nível 3 (Seguro - 2FA)
+      </a>
     </div>
   </body>
 </html>
