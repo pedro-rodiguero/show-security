@@ -79,3 +79,8 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, "static"),
 ]
+
+# Diretório para onde o `collectstatic` irá copiar os arquivos estáticos para produção.
+STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
+
+WSGI_APPLICATION = "show_security.wsgi.application"
