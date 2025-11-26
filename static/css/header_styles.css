@@ -1,0 +1,70 @@
+/* static/css/header_style.css */
+
+.main-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  padding: 10px 30px;
+  background: rgba(0, 0, 0, 0.7); /* Fundo semi-transparente */
+  color: white;
+  z-index: 100; /* Garante que o header esteja no topo */
+  display: flex;
+  justify-content: space-between; /* Espalha as seções */
+  align-items: center;
+  box-sizing: border-box;
+}
+
+.header-section {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+/* --- Logo e Nome do Site --- */
+.header-logo {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  color: white;
+  font-weight: bold;
+}
+
+.logo-small {
+  height: 30px; /* Tamanho pequeno para o logo no header */
+  width: auto;
+  margin-right: 10px;
+}
+
+.site-name {
+  font-size: 1.2em;
+}
+
+/* --- Botões e Funcionalidades --- */
+.header-btn {
+  padding: 8px 15px;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  border-radius: 5px;
+  background: transparent;
+  color: white;
+  cursor: pointer;
+  text-decoration: none;
+  font-size: 0.9em;
+  transition: background-color 0.3s, border-color 0.3s;
+}
+
+.header-btn:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+  border-color: white;
+}
+
+/* Estilo específico para o botão de solução de problemas */
+.solve-btn {
+  background-color: #bd232d; /* Cor de destaque */
+  border-color: #bd232d;
+}
+
+.solve-btn:hover {
+  background-color: #3e3483;
+  border-color: #3e3483;
+}

@@ -1,0 +1,31 @@
+{% load static %}
+<header
+  style="
+    position: fixed;
+    top: 0;
+    width: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    z-index: 100;
+    padding: 10px 20px;
+    display: flex;
+    align-items: center;
+  "
+>
+  <a
+    href="{% url 'home' %}"
+    style="
+      text-decoration: none;
+      color: white;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+    "
+  >
+    <img
+      src="{% static 'assets/loqed.webp' %}"
+      alt="Logo"
+      style="height: 30px; margin-right: 10px"
+    />
+    Security Demo
+  </a>
+</header>
