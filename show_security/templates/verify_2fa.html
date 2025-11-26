@@ -4,95 +4,17 @@
   <head>
     <meta charset="UTF-8" />
     <title>Verificação de Dois Fatores (2FA)</title>
-    <style>
-      html,
-      body {
-        margin: 0;
-        padding: 0;
-        height: 100%;
-        font-family: sans-serif;
-        overflow: hidden; /* Evita barras de rolagem */
-      }
-      .container {
-        display: flex;
-        width: 100vw;
-        height: 100vh;
-      }
-      .left-pane {
-        flex: 1;
-        position: relative;
-        overflow: hidden;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        background-color: #111; /* Cor de fundo caso o vídeo não carregue */
-      }
-      .video-background {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        z-index: 1;
-      }
-      .video-background iframe {
-        width: 100%;
-        height: 100%;
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        border: none;
-      }
-      .logo {
-        position: relative;
-        z-index: 2;
-        max-width: 250px;
-        opacity: 0.9;
-      }
-      .right-pane {
-        flex: 1;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        padding: 40px;
-        box-sizing: border-box;
-      }
-      .login-form {
-        width: 100%;
-        max-width: 350px;
-        display: flex;
-        flex-direction: column;
-        gap: 10px;
-      }
-      .login-form input {
-        padding: 8px;
-        font-size: 1rem;
-        text-align: center;
-      }
-      .login-form button {
-        padding: 10px;
-        background-color: #007bff;
-        color: white;
-        border: none;
-        cursor: pointer;
-        font-size: 1rem;
-      }
-      .messages {
-        list-style: none;
-        padding: 0;
-        width: 100%;
-        max-width: 350px;
-        margin-bottom: 20px;
-      }
-      .messages li.error {
-        color: red;
-        background-color: #fdd;
-        padding: 10px;
-        border-radius: 4px;
-      }
-    </style>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="{% static 'css/style.css' %}"
+    />
   </head>
   <body>
     <div class="container">

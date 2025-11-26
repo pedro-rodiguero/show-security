@@ -4,139 +4,62 @@
   <head>
     <meta charset="UTF-8" />
     <title>Login Nível {{ level }}</title>
-    <style>
-      html,
-      body {
-        margin: 0;
-        padding: 0;
-        height: 100%;
-        font-family: sans-serif;
-        overflow: hidden; /* Evita barras de rolagem */
-      }
-      .container {
-        display: flex;
-        width: 100vw;
-        height: 100vh;
-      }
-      .left-pane {
-        flex: 1;
-        position: relative;
-        overflow: hidden;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        background-color: #111; /* Cor de fundo caso o vídeo não carregue */
-      }
-      .video-background {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        z-index: 1;
-      }
-      .video-background iframe {
-        width: 100%;
-        height: 100%;
-        /* Nova abordagem para cobrir o contêiner */
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        border: none;
-      }
-      .logo {
-        position: relative;
-        z-index: 2;
-        max-width: 250px; /* Ajuste o tamanho do logo conforme necessário */
-        opacity: 0.9;
-      }
-      .right-pane {
-        flex: 1;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        padding: 40px;
-        box-sizing: border-box;
-      }
-      .login-form {
-        width: 100%;
-        max-width: 350px;
-        display: flex;
-        flex-direction: column;
-        gap: 10px;
-      }
-      .login-form input {
-        padding: 8px;
-        font-size: 1rem;
-      }
-      .login-form button {
-        padding: 10px;
-        background-color: #007bff;
-        color: white;
-        border: none;
-        cursor: pointer;
-        font-size: 1rem;
-      }
-      .messages {
-        list-style: none;
-        padding: 0;
-        width: 100%;
-        max-width: 350px;
-        margin-bottom: 20px;
-      }
-      .messages li.error {
-        color: red;
-        background-color: #fdd;
-        padding: 10px;
-        border-radius: 4px;
-      }
-      .messages li.success {
-        color: green;
-      }
-      .messages li.warning {
-        color: orange;
-      }
-    </style>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="{% static 'css/style.css' %}"
+    />
   </head>
   <body>
-    <div class="container">
-      <div class="left-pane">
-        <div class="video-background">
-          <iframe
-            src="https://www.youtube-nocookie.com/embed/hUMhJ0m5fEs?autoplay=1&mute=1&loop=1&playlist=hUMhJ0m5fEs&controls=0&showinfo=0&modestbranding=1"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-            referrerpolicy="strict-origin-when-cross-origin"
-          ></iframe>
+    <div class="main-wrapper">
+      <div class="container">
+        <div class="left-pane">
+          <div class="video-background">
+            <iframe
+              src="https://www.youtube-nocookie.com/embed/hUMhJ0m5fEs?autoplay=1&mute=1&loop=1&playlist=hUMhJ0m5fEs&controls=0&showinfo=0&vq=hd1080"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+              referrerpolicy="strict-origin-when-cross-origin"
+            ></iframe>
+          </div>
+          <div class="left-content">
+            <img
+              src="{% static 'assets/loqed.webp' %}"
+              alt="Logo Loqed Systems"
+              class="logo"
+            />
+          </div>
         </div>
-        <img
-          src="{% static 'assets/loqedsystems_logo.jpeg' %}"
-          alt="Logo"
-          class="logo"
-        />
-      </div>
-      <div class="right-pane">
-        <h1>Login Nível {{ level }}</h1>
 
-        {% if messages %}
-        <ul class="messages">
-          {% for message in messages %}
-          <li class="{{ message.tags }}">{{ message }}</li>
-          {% endfor %}
-        </ul>
-        {% endif %}
+        <div class="right-pane">
+          <h1>Login Nível {{ level }}</h1>
 
-        <form method="post" class="login-form">
-          {% csrf_token %}
-          <label for="username">Usuário:</label>
-          <input type="text" id="username" name="username" required />
+          {% if messages %}
+          <ul class="messages">
+            {% for message in messages %}
+            <li class="{{ message.tags }}">{{ message }}</li>
+            {% endfor %}
+          </ul>
+          {% endif %}
 
-          <label for="password">Senha:</label>
-          <input type="password" id="password" name="password" required />
+          <form method="post" class="login-form">
+            {% csrf_token %}
+            <label for="username">Usuário:</label>
+            <input type="text" id="username" name="username" required />
 
-          <button type="submit">Entrar</button>
-        </form>
+            <label for="password">Senha:</label>
+            <input type="password" id="password" name="password" required />
+
+            <button type="submit">Entrar</button>
+
+            <div class="social-login"></div>
+          </form>
+        </div>
       </div>
     </div>
   </body>
